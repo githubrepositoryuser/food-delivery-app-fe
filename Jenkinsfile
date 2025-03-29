@@ -7,7 +7,7 @@ tools {
 
  environment {
     DOCKER_REGISTRY = "docker.io"
-    DOCKERHUB_CREDENTIALS = credentials('DOCKER_HUB_CREDENTIAL')
+    DOCKERHUB_CREDENTIALS = credentials('DOCKER_HUB_CREDENTIALS')
     VERSION = "${env.BUILD_ID}"
   }
 
@@ -31,8 +31,8 @@ tools {
     stage('Docker Build and Push') {
       steps {
           sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-          sh 'docker build -t codedecode25/food-delivery-app-fe:${VERSION} .'
-          sh 'docker push codedecode25/food-delivery-app-fe:${VERSION}'
+          sh 'docker build -t mukeshpnbe/food-delivery-app-fe:${VERSION} .'
+          sh 'docker push mukeshpnbe/food-delivery-app-fe:${VERSION}'
       }
     }
 
@@ -45,14 +45,14 @@ tools {
 
      stage('Update Image Tag in GitOps') {
       steps {
-         checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: 'git-ssh', url: 'git@github.com:udemy-dev-withK8s-AWS-codedecode/deployment-folder.git']])
+         checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'git-ssh', url: 'git@github.com:githubrepositoryuser/deployment-folder.git']])
         script {
           // Set the new image tag with the Jenkins build number
        sh '''
-          sed -i "s/image:.*/image: codedecode25\\/food-delivery-app-fe:${VERSION}/" aws/angular-manifest.yml
+          sed -i "s/image:.*/image: mukeshpnbe\\/food-delivery-app-fe:${VERSION}/" aws/angular-manifest.yml
         '''
 
-          sh 'git checkout master'
+          sh 'git checkout main'
           sh 'git add .'
           sh 'git commit -m "Update image tag"'
         sshagent(['git-ssh'])
